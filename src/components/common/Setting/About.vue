@@ -65,9 +65,6 @@ onMounted(() => {
         {{ $t("setting.balance") }}：{{ config?.balance ?? '-' }}
         <span class="text-xs text-neutral-400">({{ $t('setting.monthlyUsage') }})</span>
       </p>
-      <p v-if="!isChatGPTAPI">
-        {{ $t("setting.reverseProxy") }}：{{ config?.reverseProxy ?? '-' }}
-      </p>
       <p>{{ $t("setting.timeout") }}：{{ config?.timeoutMs ?? '-' }}</p>
       <p>{{ $t("setting.socks") }}：{{ config?.socksProxy ?? '-' }}</p>
       <p>{{ $t("setting.httpsProxy") }}：{{ config?.httpsProxy ?? '-' }}</p>
