@@ -537,11 +537,33 @@ onUnmounted(() => {
           class="w-full max-w-screen-xl m-auto dark:bg-[#101014]"
           :class="[isMobile ? 'p-2' : 'p-4']"
         >
-          <NSpin :show="firstLoading">
-            <template v-if="!dataSources.length">
-              <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
-                <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
-                <span>Aha~</span>
+          <template v-if="!dataSources.length">
+            <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
+              <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
+              <span>Aha~</span>
+              <div>欢迎使用EVAN提供的ChatGPT对话机器人，因使用ChatGPT Plus(Model: GPT-4)引擎，回答逻辑更清晰，内容也更优质，减少了反复提问，但反应速度会慢一些。</div>
+            </div>
+          </template>
+          <template v-else>
+            <div>
+              <Message
+                v-for="(item, index) of dataSources"
+                :key="index"
+                :date-time="item.dateTime"
+                :text="item.text"
+                :inversion="item.inversion"
+                :error="item.error"
+                :loading="item.loading"
+                @regenerate="onRegenerate(index)"
+                @delete="handleDelete(index)"
+              />
+              <div class="sticky bottom-0 left-0 flex justify-center">
+                <NButton v-if="loading" type="warning" @click="handleStop">
+                  <template #icon>
+                    <SvgIcon icon="ri:stop-circle-line" />
+                  </template>
+                  Stop Responding
+                </NButton>
               </div>
             </template>
             <template v-else>

@@ -1,0 +1,21 @@
+name: Trigger Repo2 Action
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Specific Action in Repo2
+        run: |
+          curl -X POST \
+              -H "Authorization: token ${TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Content-Type: application/json" \
+              --data '{"event_type": "chatgpt-web"}' \
+              https://api.github.com/repos/EvanDbg/docker-image-to-aliyun/dispatches
+        env:
+          TOKEN: ${{ secrets.REPO2_PERSONAL_ACCESS_TOKEN }}
