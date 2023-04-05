@@ -4,8 +4,19 @@ import { NModal, NTabPane, NTabs } from 'naive-ui'
 import General from './General.vue'
 import Advanced from './Advanced.vue'
 import About from './About.vue'
-import { useAuthStore } from '@/store'
+import Site from './Site.vue'
+import Mail from './Mail.vue'
 import { SvgIcon } from '@/components/common'
+import { useAuthStore, useUserStore } from '@/store'
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<Emit>()
+
+const userStore = useUserStore()
+const authStore = useAuthStore()
+
+const isChatGPTAPI = computed<boolean>(() => !!authStore.isChatGPTAPI)
 
 interface Props {
   visible: boolean
@@ -14,14 +25,6 @@ interface Props {
 interface Emit {
   (e: 'update:visible', visible: boolean): void
 }
-
-const props = defineProps<Props>()
-
-const emit = defineEmits<Emit>()
-
-const authStore = useAuthStore()
-
-const isChatGPTAPI = computed<boolean>(() => !!authStore.isChatGPTAPI)
 
 const active = ref('General')
 
@@ -57,12 +60,26 @@ const show = computed({
             <Advanced />
           </div>
         </NTabPane>
-        <NTabPane name="Config" tab="Config">
+        <NTabPane v-if="userStore.userInfo.root" name="Config" tab="Config">
           <template #tab>
             <SvgIcon class="text-lg" icon="ri:list-settings-line" />
             <span class="ml-2">{{ $t('setting.config') }}</span>
           </template>
           <About />
+        </NTabPane>
+        <NTabPane v-if="userStore.userInfo.root" name="SiteConfig" tab="SiteConfig">
+          <template #tab>
+            <SvgIcon class="text-lg" icon="ri:settings-line" />
+            <span class="ml-2">{{ $t('setting.siteConfig') }}</span>
+          </template>
+          <Site />
+        </NTabPane>
+        <NTabPane v-if="userStore.userInfo.root" name="MailConfig" tab="MailConfig">
+          <template #tab>
+            <SvgIcon class="text-lg" icon="ri:mail-line" />
+            <span class="ml-2">{{ $t('setting.mailConfig') }}</span>
+          </template>
+          <Mail />
         </NTabPane>
       </NTabs>
     </div>
