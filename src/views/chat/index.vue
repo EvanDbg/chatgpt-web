@@ -11,10 +11,9 @@ import { useChat } from './hooks/useChat'
 import { useCopyCode } from './hooks/useCopyCode'
 import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
-import SysMsgPopUp from './layout/SysMsgPopUp.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore, useSettingStore } from '@/store'
+import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 
@@ -27,7 +26,6 @@ const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
-const settingStore = useSettingStore()
 
 useCopyCode()
 
@@ -43,7 +41,6 @@ const conversationList = computed(() => dataSources.value.filter(item => (!item.
 
 const prompt = ref<string>('')
 const loading = ref<boolean>(false)
-const showSysMsgPopUp = ref<boolean>(false)
 const inputRef = ref<Ref | null>(null)
 
 // 添加PromptStore
@@ -94,9 +91,6 @@ async function onConversation() {
 
   if (lastContext && usingContext.value)
     options = { ...lastContext }
-
-  // always add system message to options: either default or customized
-  options.systemMessage = settingStore.currentSystemMessage(+uuid)
 
   addChat(
     +uuid,
@@ -227,9 +221,6 @@ async function onRegenerate(index: number) {
   if (requestOptions.options)
     options = { ...requestOptions.options }
 
-  // always add system message to options: either default or customized
-  options.systemMessage = settingStore.currentSystemMessage(+uuid)
-
   loading.value = true
 
   updateChat(
@@ -324,10 +315,6 @@ async function onRegenerate(index: number) {
   finally {
     loading.value = false
   }
-}
-
-function handleSetSysMsg() {
-  showSysMsgPopUp.value = true
 }
 
 function handleExport() {
@@ -545,11 +532,6 @@ onUnmounted(() => {
               <SvgIcon icon="ri:chat-history-line" />
             </span>
           </HoverButton>
-          <HoverButton @click="handleSetSysMsg">
-            <span class="text-xl text-[#4f555e] dark:text-white">
-              <SvgIcon icon="ri:command-line" />
-            </span>
-          </HoverButton>
           <NAutoComplete v-model:value="prompt" :options="searchOptions" :render-label="renderOption">
             <template #default="{ handleInput, handleBlur, handleFocus }">
               <NInput
@@ -576,5 +558,4 @@ onUnmounted(() => {
       </div>
     </footer>
   </div>
-  <SysMsgPopUp v-model:visible="showSysMsgPopUp" v-model:uuid="uuid" />
 </template>
