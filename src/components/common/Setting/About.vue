@@ -1,24 +1,20 @@
 <script setup lang='ts'>
 import { computed, onMounted, ref } from 'vue'
-import { NSpin } from 'naive-ui'
-import { fetchChatConfig } from '@/api'
-import pkg from '@/../package.json'
+import { NButton, NInput, NSpin, useMessage } from 'naive-ui'
+import { ConfigState } from './model'
+import { fetchChatConfig, fetchUpdateBaseSetting } from '@/api'
 import { useAuthStore } from '@/store'
+import { t } from '@/locales'
 
-interface ConfigState {
-  timeoutMs?: number
-  reverseProxy?: string
-  apiModel?: string
-  socksProxy?: string
-  httpsProxy?: string
-  balance?: string
-}
+const ms = useMessage()
 
 const authStore = useAuthStore()
 
 const loading = ref(false)
+const saving = ref(false)
 
 const config = ref<ConfigState>()
+config.value = new ConfigState()
 
 const isChatGPTAPI = computed<boolean>(() => !!authStore.isChatGPTAPI)
 
@@ -33,6 +29,21 @@ async function fetchConfig() {
   }
 }
 
+async function updateBaseSetting(baseConfig?: Partial<ConfigState>) {
+  if (!baseConfig)
+    return
+  saving.value = true
+  try {
+    const { data } = await fetchUpdateBaseSetting(baseConfig)
+    config.value = data
+    ms.success(t('common.success'))
+  }
+  catch (error: any) {
+    ms.error(error.message)
+  }
+  saving.value = false
+}
+
 onMounted(() => {
   fetchConfig()
 })
@@ -40,37 +51,72 @@ onMounted(() => {
 
 <template>
   <NSpin :show="loading">
-    <div class="p-4 space-y-4">
-      <h2 class="text-xl font-bold">
-        Version - {{ pkg.version }}
-      </h2>
-      <div class="p-2 space-y-2 rounded-md bg-neutral-100 dark:bg-neutral-700">
-        <p>
-          此项目开源于
-          <a
-            class="text-blue-600 dark:text-blue-500"
-            href="https://github.com/Chanzhaoyu/chatgpt-web"
-            target="_blank"
-          >
-            Github
-          </a>
-          ，免费且基于 MIT 协议，没有任何形式的付费行为！
-        </p>
-        <p>
-          如果你觉得此项目对你有帮助，请在 Github 帮我点个 Star 或者给予一点赞助，谢谢！
-        </p>
+    <div class="p-4 space-y-5 min-h-[200px]">
+      <div class="space-y-6">
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.api') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.apiKey" placeholder="" @input="(val) => { if (config) config.apiKey = val }" />
+          </div>
+          <p v-if="isChatGPTAPI">
+            {{ $t("setting.balance") }}：{{ config?.balance ?? '-' }}
+          </p>
+        </div>
+        <div v-if="isChatGPTAPI" class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.apiBaseUrl') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.apiBaseUrl" placeholder="https://api.openai.com" @input="(val) => { if (config) config.apiBaseUrl = val }" />
+          </div>
+        </div>
+        <div v-if="isChatGPTAPI" class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.apiModel') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.apiModel" placeholder="" @input="(val) => { if (config) config.apiModel = val }" />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.accessToken') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.accessToken" placeholder="" @input="(val) => { if (config) config.accessToken = val }" />
+          </div>
+        </div>
+        <div v-if="!isChatGPTAPI" class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.reverseProxy') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.reverseProxy" placeholder="" @input="(val) => { if (config) config.reverseProxy = val }" />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.timeout') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.timeoutMs !== undefined ? String(config.timeoutMs) : undefined" placeholder="" @input="(val) => { if (config) config.timeoutMs = typeof val === 'string' ? Number(val) : undefined }" />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.socks') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.socksProxy" placeholder="" @input="(val) => { if (config) config.socksProxy = val }" />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.socksAuth') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.socksAuth" placeholder="name:pasword" @input="(val) => { if (config) config.socksAuth = val }" />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]">{{ $t('setting.httpsProxy') }}</span>
+          <div class="flex-1">
+            <NInput :value="config && config.httpsProxy" placeholder="" @input="(val) => { if (config) config.httpsProxy = val }" />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex-shrink-0 w-[100px]" />
+          <NButton :loading="saving" type="primary" @click="updateBaseSetting(config)">
+            {{ $t('common.save') }}
+          </NButton>
+        </div>
       </div>
-      <p>{{ $t("setting.api") }}：{{ config?.apiModel ?? '-' }}</p>
-      <p v-if="isChatGPTAPI">
-        {{ $t("setting.balance") }}：{{ config?.balance ?? '-' }}
-        <span class="text-xs text-neutral-400">({{ $t('setting.monthlyUsage') }})</span>
-      </p>
-      <p v-if="!isChatGPTAPI">
-        {{ $t("setting.reverseProxy") }}：{{ config?.reverseProxy ?? '-' }}
-      </p>
-      <p>{{ $t("setting.timeout") }}：{{ config?.timeoutMs ?? '-' }}</p>
-      <p>{{ $t("setting.socks") }}：{{ config?.socksProxy ?? '-' }}</p>
-      <p>{{ $t("setting.httpsProxy") }}：{{ config?.httpsProxy ?? '-' }}</p>
     </div>
   </NSpin>
 </template>

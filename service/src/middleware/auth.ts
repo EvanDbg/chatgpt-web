@@ -1,12 +1,13 @@
-import { isNotEmptyString } from '../utils/is'
+import jwt from 'jsonwebtoken'
+import { getCacheConfig } from '../storage/config'
 
 const auth = async (req, res, next) => {
-  const AUTH_SECRET_KEY = process.env.AUTH_SECRET_KEY
-  if (isNotEmptyString(AUTH_SECRET_KEY)) {
+  const config = await getCacheConfig()
+  if (config.siteConfig.loginEnabled) {
     try {
-      const Authorization = req.header('Authorization')
-      if (!Authorization || Authorization.replace('Bearer ', '').trim() !== AUTH_SECRET_KEY.trim())
-        throw new Error('Error: 无访问权限 | No access rights')
+      const token = req.header('Authorization').replace('Bearer ', '')
+      const info = jwt.verify(token, config.siteConfig.loginSalt.trim())
+      req.headers.userId = info.userId
       next()
     }
     catch (error) {
@@ -14,6 +15,8 @@ const auth = async (req, res, next) => {
     }
   }
   else {
+    // fake userid
+    req.headers.userId = '6406d8c50aedd633885fa16f'
     next()
   }
 }
