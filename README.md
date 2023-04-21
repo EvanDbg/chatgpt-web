@@ -7,7 +7,17 @@
 </br>
 
 ## 说明
-> **此项目 Fork 自 [Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web), 除了定时合并该分支, 新增了部分特色功能, 注册&登录, 前端页面设置apikey 等**
+> **此项目 Fork 自 [Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web), 新增了部分特色功能:**
+
+[✓] 注册&登录&重置密码
+
+[✓] 同步历史会话
+
+[✓] 前端页面设置apikey
+
+[✓] 自定义敏感词
+
+[✓] 每个会话设置独有 Prompt
 </br>
 
 ## 截图
@@ -17,6 +27,7 @@
 ![cover](./docs/c1.png)
 ![cover2](./docs/c2.png)
 ![cover3](./docs/basesettings.jpg)
+![cover3](./docs/prompt.jpg)
 
 - [ChatGPT Web](#chatgpt-web)
 	- [介绍](#介绍)
@@ -185,7 +196,6 @@ pnpm dev
 - `SOCKS_PROXY_HOST` 和 `SOCKS_PROXY_PORT` 一起时生效，可选
 - `SOCKS_PROXY_PORT` 和 `SOCKS_PROXY_HOST` 一起时生效，可选
 - `HTTPS_PROXY` 支持 `http`，`https`, `socks5`，可选
-- `ALL_PROXY` 支持 `http`，`https`, `socks5`，可选
 
 ## 打包
 
@@ -242,7 +252,7 @@ services:
       # 每小时最大请求次数，可选，默认无限
       MAX_REQUEST_PER_HOUR: 0
       # 超时，单位毫秒，可选
-      TIMEOUT_MS: 60000
+      TIMEOUT_MS: 600000
       # Socks代理，可选，和 SOCKS_PROXY_PORT 一起时生效
       SOCKS_PROXY_HOST: xxx
       # Socks代理端口，可选，和 SOCKS_PROXY_HOST 一起时生效
@@ -271,6 +281,13 @@ services:
       SMTP_TSL: true
       SMTP_USERNAME: noreply@examile.com
       SMTP_PASSWORD: xxx
+      # 是否开启敏感词审核, 因为响应结果是流式 所以暂时没审核
+      AUDIT_ENABLED: false
+      # https://ai.baidu.com/ai-doc/ANTIPORN/Vk3h6xaga
+      AUDIT_PROVIDER: baidu
+      AUDIT_API_KEY: xxx
+      AUDIT_API_SECRET: xxx
+      AUDIT_TEXT_LABEL: xxx
     links:
       - database
 
@@ -316,7 +333,6 @@ volumes:
 | `SOCKS_PROXY_USERNAME`   | 可选，和 `SOCKS_PROXY_HOST` 一起时生效 | Socks代理用户名    |
 | `SOCKS_PROXY_PASSWORD`   | 可选，和 `SOCKS_PROXY_HOST` 一起时生效 | Socks代理密码    |
 | `HTTPS_PROXY`   | 可选 | HTTPS 代理，支持 http，https, socks5    |
-| `ALL_PROXY`   | 可选 | 所有代理 代理，支持 http，https, socks5    |
 
 > 注意: `Railway` 修改环境变量会重新 `Deploy`
 
