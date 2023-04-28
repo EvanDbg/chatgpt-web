@@ -16,7 +16,7 @@ jobs:
               -H "Authorization: token ${TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
               -H "Content-Type: application/json" \
-              --data '{"event_type": "chatgpt-web", "inputs": {"branch_name": "Kerwin1202"}}' \
+              --data '{"event_type": "chatgpt-web"}' \
               https://api.github.com/repos/EvanDbg/docker-image-to-aliyun/dispatches
         env:
           TOKEN: ${{ secrets.REPO2_PERSONAL_ACCESS_TOKEN }}
