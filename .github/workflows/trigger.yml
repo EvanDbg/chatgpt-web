@@ -1,6 +1,7 @@
 name: Trigger Repo2 Action
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - Kerwin1202
