@@ -12,11 +12,12 @@ jobs:
     steps:
       - name: Trigger Specific Action in Repo2
         run: |
+          run: |
           curl -X POST \
               -H "Authorization: token ${TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
               -H "Content-Type: application/json" \
-              --data '{"event_type": "chatgpt-web"}' \
+              --data '{"event_type": "chatgpt-web-Kerwin1202"}' \
               https://api.github.com/repos/EvanDbg/docker-image-to-aliyun/dispatches
         env:
           TOKEN: ${{ secrets.REPO2_PERSONAL_ACCESS_TOKEN }}
