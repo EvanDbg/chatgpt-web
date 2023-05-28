@@ -5,6 +5,13 @@ on:
   push:
     branches:
       - Kerwin1202
+  pull_request:
+    branches:
+      - Kerwin1202
+    types: [closed]
+  pull_request_target:
+    branches:
+      - Kerwin1202
 
 jobs:
   trigger:
